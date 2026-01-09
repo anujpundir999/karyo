@@ -19,4 +19,4 @@ class UserResponseSchema(BaseModel):
     created_at: datetime = Field(..., description="The timestamp when the user was created")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
