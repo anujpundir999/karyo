@@ -4,6 +4,8 @@ from sqlalchemy import text
 from app.db.session import engine
 import logging
 
+from app.api import auth
+
 logger = logging.getLogger("uvicorn")
 
 
@@ -21,3 +23,5 @@ app = FastAPI(title="Karyo API",lifespan=lifespan)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+app.include_router(auth.router)
