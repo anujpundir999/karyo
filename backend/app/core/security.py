@@ -1,9 +1,6 @@
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
+from pwdlib import PasswordHash
+from pwdlib.hashers.bcrypt import BcryptHasher
+pwd_context = PasswordHash((BcryptHasher(),))
 
 def hash_password(password:str)->str:
     return pwd_context.hash(password)
