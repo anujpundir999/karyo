@@ -1,7 +1,7 @@
 from app.repositories.user import UserRepository
 from app.models.user import User
 from app.schemas.user import UserCreateSchema
-from app.core.security import hash_password
+from app.core.security.hashing import hash_password
 
 
 class UserService:
