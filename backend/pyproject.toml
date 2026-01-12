@@ -15,4 +15,5 @@ dependencies = [
     "bcrypt>=5.0.0",
     "pwdlib[bcrypt]>=0.3.0",
     "pyjwt>=2.10.1",
+    "redis>=7.1.0",
 ]
