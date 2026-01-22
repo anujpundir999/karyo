@@ -39,7 +39,20 @@ class ProjectRepository:
         await self.db.flush()
         return project
     
-    async def add_member(self,project:Project,user_id,project_id,role:str)->ProjectMember:
+    async def add_member_to_project(self, user_id, project_id, role:str)->ProjectMember:
         member = ProjectMember(user_id=user_id,project_id=project_id,role=role,)
-        self.db.commit()
+        self.db.add(member)
+        await self.db.flush()
         await self.db.refresh(member)
+        return member
+
+    async def is_user_project_member(self,project_id,user_id)->bool:
+        result = await self.db.execute(
+            select(ProjectMember).where(
+                ProjectMember.project_id == project_id,
+                ProjectMember.user_id == user_id
+            )
+        )
+        if result.scalar_one_or_none():
+            return True
+        return False
