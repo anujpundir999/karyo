@@ -5,7 +5,7 @@ from app.db.session import engine
 import logging
 
 from app.api import auth
-
+from app.api import project
 logger = logging.getLogger("uvicorn")
 
 
@@ -25,3 +25,4 @@ def health():
     return {"status": "ok"}
 
 app.include_router(auth.router)
+app.include_router(project.router)

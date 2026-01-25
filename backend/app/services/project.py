@@ -2,11 +2,13 @@ from app.repositories.project import ProjectRepository
 from app.schemas.project import ProjectCreateSchema
 from app.models.user import User
 from app.repositories.user import UserRepository
+from sqlalchemy.ext.asyncio import AsyncSession
 
 class ProjectService:
-    def __init__(self, repo: ProjectRepository,user_repo:UserRepository):
-        self.repo = repo
-        self.user_repo = user_repo
+    def __init__(self,db:AsyncSession):
+        self.repo = ProjectRepository(db)
+        self.user_repo = UserRepository(db)
+        self.db = db
     
     async def create_project_for_user(
             self,
@@ -14,6 +16,14 @@ class ProjectService:
             current_user:User
     ):
         project = await self.repo.create_project(project_details.name,project_details.description,current_user.id)
+        
+        await self.repo.add_member_to_project(
+            user_id=current_user.id,
+            project_id=project.id,
+            role = "OWNER",
+        )
+
+        await self.db.commit()
         return project
     
     async def add_member_to_project(
@@ -49,4 +59,14 @@ class ProjectService:
             role="MEMBER"
         )
 
+        await self.db.commit()
+
         return project_member
+    async def list_projects_for_user(
+            self,
+            current_user:User
+    ):
+        projects = await self.repo.get_projects_by_user(
+            current_user.id
+        )
+        return projects

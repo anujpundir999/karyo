@@ -16,7 +16,7 @@ class ProjectRepository:
     
     async def get_projects_by_user(self,user_id)->list[Project]:
         result = await self.db.execute(
-            select(Project).join(ProjectMember).where(ProjectMember.user_id == user_id)
+            select(Project).distinct().join(ProjectMember).where(ProjectMember.user_id == user_id)
         )
         return result.scalars().all()
     
