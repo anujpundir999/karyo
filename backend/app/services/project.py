@@ -3,6 +3,7 @@ from app.schemas.project import ProjectCreateSchema
 from app.models.user import User
 from app.repositories.user import UserRepository
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException, status
 
 class ProjectService:
     def __init__(self,db:AsyncSession):
@@ -38,12 +39,18 @@ class ProjectService:
         )
 
         if not is_member:
-            raise ValueError("Current user is not a member of the project which means they are not authorized to add new members.")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not a member of this project",
+            )
         
         #get user by email
         user_to_add = await self.user_repo.get_by_email(user_email)
         if not user_to_add:
-            raise ValueError("User with the provided email does not exist.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User with the provided email does not exist.",
+            )
         
         already_member = await self.repo.is_user_project_member(
             project_id,
@@ -51,7 +58,10 @@ class ProjectService:
         )
 
         if already_member:
-            raise ValueError("User is already a member of the project.")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User is already a member of the project.",
+            )
         
         project_member = await self.repo.add_member_to_project(
             user_to_add.id,
