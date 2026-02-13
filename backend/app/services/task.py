@@ -9,10 +9,10 @@ class TaskService:
         self.project_repository = ProjectRepository(db)
         self.task_repository = TaskRepository(db)
     
-    async def create_task(self,TaskData,project_id):
+    async def create_task(self,TaskData,project_id,user_id):
         is_member = await self.project_repository.is_user_project_member(
             project_id,
-            user_id=TaskData.assigned_to
+            user_id=user_id
         )
         if not is_member:
             raise HTTPException(
@@ -21,8 +21,9 @@ class TaskService:
             )
 
 
-        await self.task_repository.create_task(TaskData,project_id)
+        task = await self.task_repository.create_task(TaskData,project_id)
         await self.db.commit()
+        return task
     
     async def get_tasks_for_project(self,project_id,user_id):
         is_member = await self.project_repository.is_user_project_member(

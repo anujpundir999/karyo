@@ -6,6 +6,7 @@ import logging
 
 from app.api import auth
 from app.api import project
+from app.api import task
 logger = logging.getLogger("uvicorn")
 
 
@@ -26,3 +27,4 @@ def health():
 
 app.include_router(auth.router)
 app.include_router(project.router)
+app.include_router(task.router)
