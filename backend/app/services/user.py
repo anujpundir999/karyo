@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
-from http.client import HTTPException
+from fastapi import HTTPException
 from fastapi.params import Depends
-from fastapi.responses import JSONResponse
 from app.repositories.user import UserRepository
 from app.models.user import User
 from app.schemas.user import UserCreateSchema,UserLoginSchema
@@ -52,7 +51,7 @@ class UserService:
         password_valid = verify_password(password, user.password_hash)
         if not password_valid:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials."
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials.",
             )
 
         access_token = create_access_token(

@@ -57,3 +57,21 @@ async def add_member_to_project(
         current_user
     )
     return project_member
+
+@router.get(
+    "/{project_id}/members",
+    status_code=status.HTTP_200_OK,
+    summary="Get members of a project",
+)
+async def get_members_of_project(
+    project_id:str,
+    db: AsyncSession = Depends(get_db),
+    current_user  : User = Depends(get_current_user),
+):
+    service = ProjectService(db)
+
+    members = await service.get_members_of_project(
+        project_id,
+        current_user.id
+)
+    return members

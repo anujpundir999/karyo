@@ -80,3 +80,20 @@ class ProjectService:
             current_user.id
         )
         return projects
+    
+    async def get_members_of_project(
+            self,
+            project_id,
+            user_id
+    ):
+        is_member = await self.repo.is_user_project_member(
+            project_id,
+            user_id
+        )
+        if not is_member:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not a member of this project",
+            )
+        members = await self.repo.get_project_members(project_id)
+        return members

@@ -56,3 +56,11 @@ class ProjectRepository:
         if result.scalar_one_or_none():
             return True
         return False
+    
+    async def get_project_members(self,project_id)->list[ProjectMember]:
+        result = await self.db.execute(
+            select(ProjectMember).where(ProjectMember.project_id == project_id)
+        )
+        print(result)
+        return result.scalars().all()
+        
