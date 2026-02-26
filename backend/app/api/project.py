@@ -1,7 +1,7 @@
 from fastapi import APIRouter,Depends,HTTPException,status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
-from app.schemas.project import ProjectCreateSchema,ProjectResponseSchema,ProjectUpdateSchema,ProjectMemberAddSchema
+from app.schemas.project import ProjectCreateSchema,ProjectResponseSchema,ProjectUpdateSchema,ProjectMemberAddSchema,ProjectMemberResponseSchema
 from app.services.project import ProjectService
 from app.repositories.project import ProjectRepository
 from app.repositories.user import UserRepository
@@ -60,6 +60,7 @@ async def add_member_to_project(
 
 @router.get(
     "/{project_id}/members",
+    response_model=list[ProjectMemberResponseSchema],
     status_code=status.HTTP_200_OK,
     summary="Get members of a project",
 )

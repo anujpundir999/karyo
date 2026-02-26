@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.project import Project
 from app.models.project_member import ProjectMember
+from app.models.user import User
 
 
 class ProjectRepository:
@@ -46,21 +47,28 @@ class ProjectRepository:
         await self.db.refresh(member)
         return member
 
-    async def is_user_project_member(self,project_id,user_id)->bool:
+    async def is_user_project_member(self,project_id,user_id)->ProjectMember|None:
         result = await self.db.execute(
             select(ProjectMember).where(
                 ProjectMember.project_id == project_id,
                 ProjectMember.user_id == user_id
             )
         )
-        if result.scalar_one_or_none():
-            return True
-        return False
+        return result.scalar_one_or_none()
     
-    async def get_project_members(self,project_id)->list[ProjectMember]:
+    async def get_project_members(self, project_id) -> list:
         result = await self.db.execute(
-            select(ProjectMember).where(ProjectMember.project_id == project_id)
+            select(
+                ProjectMember.id,
+                ProjectMember.user_id,
+                ProjectMember.project_id,
+                ProjectMember.role,
+                ProjectMember.joined_at,
+                User.username,
+                User.email,
+            ).join(User, ProjectMember.user_id == User.id)
+             .where(ProjectMember.project_id == project_id)
         )
-        print(result)
-        return result.scalars().all()
-        
+        rows = result.mappings().all()
+        return [dict(r) for r in rows]
+

@@ -7,6 +7,7 @@ import logging
 from app.api import auth
 from app.api import project
 from app.api import task
+from fastapi.middleware.cors import CORSMiddleware
 logger = logging.getLogger("uvicorn")
 
 
@@ -21,7 +22,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Karyo API",lifespan=lifespan)
 
-from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,

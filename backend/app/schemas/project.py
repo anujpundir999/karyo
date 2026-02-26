@@ -22,3 +22,15 @@ class ProjectUpdateSchema(BaseModel):
 
 class ProjectMemberAddSchema(BaseModel):
     email : EmailStr = Field(...,description="Email of the user to be added as a project member")
+
+class ProjectMemberResponseSchema(BaseModel):
+    id : UUID = Field(...,description="Unique identifier of the membership")
+    user_id : UUID = Field(...,description="Unique identifier of the user")
+    username : str = Field(...,description="Username of the member")
+    email : str = Field(...,description="Email of the member")
+    project_id : UUID = Field(...,description="Unique identifier of the project")
+    role : str = Field(...,description="Role of the member in the project")
+    joined_at : datetime = Field(...,description="Timestamp when the member joined")
+
+    class Config:
+        from_attributes = True

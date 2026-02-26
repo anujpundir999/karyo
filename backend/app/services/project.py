@@ -38,11 +38,20 @@ class ProjectService:
             current_user.id
         )
 
+        print("is_member--->",is_member)
+
         if not is_member:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You are not a member of this project",
             )
+        
+        if is_member.role != "OWNER":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only project owners can add members to the project.",
+            )
+
         
         #get user by email
         user_to_add = await self.user_repo.get_by_email(user_email)
