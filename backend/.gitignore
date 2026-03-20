@@ -5,3 +5,6 @@ htmlcov/
 
 # pytest cache
 .pytest_cache/
+
+#test database
+test.db
