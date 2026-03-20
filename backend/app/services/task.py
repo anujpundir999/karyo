@@ -38,7 +38,7 @@ class TaskService:
         
         return await self.task_repository.get_tasks_for_project(project_id)
     
-    async def update_task_status(self,task_id,status,user_id):
+    async def update_task_status(self, task_id, new_status, user_id):
         task = await self.task_repository.get_task_by_id(task_id)
 
         if not task:
@@ -58,7 +58,7 @@ class TaskService:
                 detail="You are not a member of this project",
             )
         
-        await self.task_repository.update_task_status(task,status)
+        await self.task_repository.update_task_status(task, new_status)
         await self.db.commit()
 
         return task
