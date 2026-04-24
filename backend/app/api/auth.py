@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.schemas.user import UserCreateSchema, UserLoginSchema, UserResponseSchema
@@ -28,6 +29,12 @@ async def signup(
         user = await service.create_user(user_data)
         await db.commit()
         return user
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with this email or username already exists.",
+        )
     except ValueError as e:
         await db.rollback()
         raise HTTPException(status_code=400, detail=str(e))

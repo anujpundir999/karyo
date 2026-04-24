@@ -23,6 +23,11 @@ class UserService:
         existing = await self.repo.get_by_email(data.email)
         if existing:
             raise ValueError("Email already registered")
+
+        existing_username = await self.repo.get_by_username(data.username)
+        if existing_username:
+            raise ValueError("Username already registered")
+
         if len(data.password) < 8:
             raise ValueError("Password must be at least 8 characters")
 
