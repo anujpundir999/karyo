@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock
 from uuid import uuid4
 
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 
 from app.api import auth
 
@@ -42,6 +43,34 @@ def test_signup_duplicate_email_rolls_back_and_returns_400(client, override_db, 
 
     assert response.status_code == 400
     assert response.json()["detail"] == "Email already registered"
+    override_db.rollback.assert_awaited_once()
+
+
+def test_signup_duplicate_username_rolls_back_and_returns_400(client, override_db, monkeypatch):
+    create_user = AsyncMock(side_effect=ValueError("Username already registered"))
+    monkeypatch.setattr(auth.UserService, "create_user", create_user)
+
+    response = client.post(
+        "/auth/signup",
+        json={"email": "new@example.com", "username": "existing_user", "password": "password123"},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Username already registered"
+    override_db.rollback.assert_awaited_once()
+
+
+def test_signup_integrity_error_rolls_back_and_returns_409(client, override_db, monkeypatch):
+    create_user = AsyncMock(side_effect=IntegrityError("INSERT", {}, Exception("duplicate key")))
+    monkeypatch.setattr(auth.UserService, "create_user", create_user)
+
+    response = client.post(
+        "/auth/signup",
+        json={"email": "new@example.com", "username": "new_user", "password": "password123"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "A user with this email or username already exists."
     override_db.rollback.assert_awaited_once()
 
 

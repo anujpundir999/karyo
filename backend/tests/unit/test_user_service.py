@@ -32,9 +32,28 @@ def test_create_user_raises_when_email_already_registered():
         )
 
 
+def test_create_user_raises_when_username_already_registered():
+    repo = AsyncMock()
+    repo.get_by_email.return_value = None
+    repo.get_by_username.return_value = SimpleNamespace(id=uuid4())
+    service = UserService(repo)
+
+    with pytest.raises(ValueError, match="Username already registered"):
+        run(
+            service.create_user(
+                UserCreateSchema(
+                    email="new@example.com",
+                    username="existinguser",
+                    password="password123",
+                )
+            )
+        )
+
+
 def test_create_user_hashes_password_and_persists(monkeypatch):
     repo = AsyncMock()
     repo.get_by_email.return_value = None
+    repo.get_by_username.return_value = None
     service = UserService(repo)
 
     monkeypatch.setattr("app.services.user.hash_password", lambda _: "hashed-value")
